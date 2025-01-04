@@ -12,7 +12,7 @@ precision highp float;
 
 uniform vec2 u_resolution;
 uniform float u_time;
-uniform float u_mouse;
+uniform vec2 u_mouse;
 uniform vec4 u_mouse_button;
 uniform sampler2D u_buffer0;
 uniform sampler2D u_buffer1;

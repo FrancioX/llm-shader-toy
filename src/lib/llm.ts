@@ -2,8 +2,9 @@ import { APIError, OpenAI } from 'openai';
 import Anthropic from '@anthropic-ai/sdk';
 import { Err, Ok, Result } from 'ts-results-es';
 import { asResult } from './utils';
+import shaderExamples from '../../shader_examples.txt?raw';
 
-const systemPrompt = `
+const baseSystemPrompt = `
 You are a skilled graphics shader programmer.
 
 You answer the user's prompts with only valid webgl glsl code.
@@ -13,6 +14,16 @@ they might ask you to write a shader from scratch.
 
 Every answer should be a valid glsl shader program in the following format. You may define additional
 functions as needed.
+
+The shader must use the following uniforms:
+- u_resolution: vec2 - The resolution of the canvas
+- u_time: float - The time in seconds since the shader started
+
+For compatibility with ShaderToy examples, you can use these defines:
+#define iResolution u_resolution
+#define iTime u_time
+
+Here's a basic template:
 
 \`\`\`glsl
 #version 300 es
@@ -28,7 +39,13 @@ void main() {
     out_color = vec4(1.0, 1.0, 1.0, 1.0);
 }
 \`\`\`
+
+Here are some example shaders to help you understand the style and complexity level expected:
+
+${shaderExamples}
 `;
+
+const systemPrompt = baseSystemPrompt;
 
 const openaiModels = ['gpt-4-turbo', 'gpt-3.5-turbo'] as const;
 const claudeModels = ['claude-3-5-sonnet-20241022'] as const;
