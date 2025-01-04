@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "check": "svelte-check --tsconfig ./tsconfig.json"
+    "check": "svelte-check --tsconfig ./tsconfig.json",
+    "test:convert": "tsx src/test/convert-shader.ts"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^3.0.2",
@@ -18,7 +19,9 @@
     "prettier-plugin-svelte": "^3.2.3",
     "svelte": "^4.2.12",
     "svelte-check": "^3.6.7",
+    "ts-node": "^10.9.2",
     "tslib": "^2.6.2",
+    "tsx": "^4.19.2",
     "typescript": "^5.2.2",
     "vite": "^5.2.0"
   },
@@ -26,6 +29,6 @@
     "openai": "^4.31.0",
     "svelte-ace": "^1.0.21",
     "svelte-sonner": "^0.3.22",
-    "ts-results": "^3.3.0"
+    "ts-results-es": "^4.2.0"
   }
 }
