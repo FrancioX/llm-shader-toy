@@ -22,7 +22,7 @@
 
     // TODO: Display this in ui somewhere?
     // TODO: Should probably show 0 when it's not rendering
-    setInterval(() => console.info(`FPS: ${renderer.fpsCounter.fps.toFixed(2)}`), 1000);
+    // setInterval(() => console.info(`FPS: ${renderer.fpsCounter.fps.toFixed(2)}`), 1000);
   });
 
   function safeRunShader(shaderSource: string): void {
