@@ -19,16 +19,23 @@
   export let visible: boolean;
   export let shaderSource: string;
 
+  // Initialize OpenAI client with API key from environment
+  $: {
+    const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
+    console.log('API Key status:', apiKey ? 'Found' : 'Not found');
+    if (apiKey) {
+      openai = new OpenAI({ apiKey, dangerouslyAllowBrowser: true });
+      console.log('OpenAI client initialized');
+    } else {
+      console.warn('No API key found in environment variables');
+    }
+  }
+
   // Save the initial shader source.
   $: {
     if (initialShaderSource === undefined) {
       initialShaderSource = shaderSource;
     }
-  }
-
-  function onApikeyChange(event: any): void {
-    const apiKey = event.target.value;
-    openai = new OpenAI({ apiKey: apiKey, dangerouslyAllowBrowser: true });
   }
 
   function onMessageInputKeyDown(event: any): void {
@@ -124,12 +131,14 @@ ${error.info}
 {#if visible}
   <div id="llm-container" transition:fade>
     {#if openai === undefined}
-      <input
-        type="text"
-        id="llm-api-key"
-        placeholder="Enter OpenAI API key to start chatting"
-        on:change={onApikeyChange}
-      />
+      <div class="error-message">
+        OpenAI API key not found. Please make sure:
+        <ol>
+          <li>You have created a .env.local file</li>
+          <li>You have added VITE_OPENAI_API_KEY=your-api-key-here to the file</li>
+          <li>You have restarted the development server</li>
+        </ol>
+      </div>
     {:else}
       <div id="llm-msg-history">
         {#each turns as turn}
@@ -199,5 +208,14 @@ ${error.info}
     bottom: 1em;
     right: 1em;
     visibility: hidden;
+  }
+
+  .error-message {
+    color: #ff4136;
+    padding: 1em;
+    text-align: center;
+    background-color: #ffebee;
+    border-radius: 4px;
+    margin-bottom: 1em;
   }
 </style>
