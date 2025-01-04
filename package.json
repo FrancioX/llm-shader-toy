@@ -26,9 +26,11 @@
     "vite": "^5.2.0"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.33.1",
     "openai": "^4.31.0",
     "svelte-ace": "^1.0.21",
     "svelte-sonner": "^0.3.22",
+    "ts-results": "^3.3.0",
     "ts-results-es": "^4.2.0"
   }
 }

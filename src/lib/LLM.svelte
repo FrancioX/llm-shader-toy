@@ -1,15 +1,17 @@
 <script lang="ts">
   import { OpenAI } from 'openai';
+  import Anthropic from '@anthropic-ai/sdk';
   import { toast } from 'svelte-sonner';
   import { fade } from 'svelte/transition';
-  import { Ok } from 'ts-results';
-  import { availableModels, fetchLLMResponse, ChatTurn, type Model, RecoverableError } from './llm';
+  import { Ok } from 'ts-results-es';
+  import { availableModels, openaiModels, claudeModels, fetchLLMResponse, ChatTurn, type Model, RecoverableError, type LLMResponse } from './llm';
   import { shaderCompileError } from './stores';
   import spinner from '../assets/spinner.gif';
   import type { ShaderCompileError } from './render';
 
   // Module state.
   let openai: OpenAI | undefined;
+  let anthropic: Anthropic | undefined;
   let modelSelection: Model;
   let turns: ChatTurn[] = [];
   let revertedTurns: ChatTurn[] = [];
@@ -21,13 +23,23 @@
 
   // Initialize OpenAI client with API key from environment
   $: {
-    const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
-    console.log('API Key status:', apiKey ? 'Found' : 'Not found');
-    if (apiKey) {
-      openai = new OpenAI({ apiKey, dangerouslyAllowBrowser: true });
+    const openaiKey = import.meta.env.VITE_OPENAI_API_KEY;
+    const claudeKey = import.meta.env.VITE_CLAUDE_API_KEY;
+    
+    console.log('OpenAI API Key status:', openaiKey ? 'Found' : 'Not found');
+    console.log('Claude API Key status:', claudeKey ? 'Found' : 'Not found');
+    
+    if (openaiKey) {
+      openai = new OpenAI({ apiKey: openaiKey, dangerouslyAllowBrowser: true });
       console.log('OpenAI client initialized');
-    } else {
-      console.warn('No API key found in environment variables');
+    }
+    
+    if (claudeKey) {
+      anthropic = new Anthropic({ 
+        apiKey: claudeKey,
+        dangerouslyAllowBrowser: true
+      });
+      console.log('Claude client initialized');
     }
   }
 
@@ -81,7 +93,8 @@ ${error.info}
     messageInput.readOnly = true;
     messageSpinner.style.visibility = 'visible';
     const llmResponse = await fetchLLMResponse(
-      openai!,
+      openai,
+      anthropic,
       modelSelection,
       turns,
       shaderSource,
@@ -92,17 +105,18 @@ ${error.info}
     messageInput.value = '';
 
     llmResponse
-      .mapErr((err) => {
+      .mapErr((err: Error) => {
         if (err instanceof RecoverableError) {
           toast.warning(err.message);
         } else {
           toast.error(err.message);
           console.error(err);
           openai = undefined;
+          anthropic = undefined;
         }
         return err;
       })
-      .andThen((llmResponse) => {
+      .andThen((llmResponse: LLMResponse) => {
         turns = llmResponse.turns;
         revertedTurns = [];
         return Ok(Ok.EMPTY);
@@ -126,16 +140,25 @@ ${error.info}
     revertedTurns = revertedTurns.slice(0, -1);
     turns = [...turns, mostRecentRevertedTurn];
   }
+
+  function isModelAvailable(model: Model): boolean {
+    if (openaiModels.includes(model as any)) {
+      return !!openai;
+    } else if (claudeModels.includes(model as any)) {
+      return !!anthropic;
+    }
+    return false;
+  }
 </script>
 
 {#if visible}
   <div id="llm-container" transition:fade>
-    {#if openai === undefined}
+    {#if !openai && !anthropic}
       <div class="error-message">
-        OpenAI API key not found. Please make sure:
+        No API keys found. Please make sure:
         <ol>
           <li>You have created a .env.local file</li>
-          <li>You have added VITE_OPENAI_API_KEY=your-api-key-here to the file</li>
+          <li>You have added VITE_OPENAI_API_KEY=your-api-key-here and/or VITE_CLAUDE_API_KEY=your-api-key-here to the file</li>
           <li>You have restarted the development server</li>
         </ol>
       </div>
@@ -160,7 +183,7 @@ ${error.info}
 
       <select bind:value={modelSelection}>
         {#each availableModels as model}
-          <option value={model}>{model}</option>
+          <option value={model} disabled={!isModelAvailable(model)}>{model}</option>
         {/each}
       </select>
     {/if}
