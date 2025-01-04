@@ -1,4 +1,4 @@
-import { Err, None, Ok, Option, Result, Some } from 'ts-results';
+import { Err, None, Ok, Option, Result, Some } from 'ts-results-es';
 import { asOption, asResult } from './utils';
 
 type RenderingContext = WebGL2RenderingContext;

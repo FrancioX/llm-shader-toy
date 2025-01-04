@@ -1,4 +1,4 @@
-import { Err, None, Ok, Option, Result, Some } from 'ts-results';
+import { Err, None, Ok, Option, Result, Some } from 'ts-results-es';
 
 function asResult<T>(value: T | null | undefined, err: Error): Result<T, Error> {
   if (value === null || value === undefined) {
