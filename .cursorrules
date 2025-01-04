@@ -1,0 +1,8 @@
+This project is a web app that allows users to create glsl shaders interacting with an LLM.
+
+The project is built with Svelte, TypeScript, Vite. It depends on Svelte-Ace for the code editor component,
+and ts-results for better error handling with Result type.
+
+Do not use other libraries or frameworks without consulting the user first.
+
+The shaders are fragment shaders written in GLSL and are complied and rendered using WebGL.
