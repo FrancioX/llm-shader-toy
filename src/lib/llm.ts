@@ -4,10 +4,10 @@ import { Err, Ok, Result } from 'ts-results-es';
 import { asResult } from './utils';
 import shaderExamples from '../../shader_examples.txt?raw';
 
-const baseSystemPrompt = `
-You are a skilled graphics shader programmer.
+const systemPrompt = `
+You are a skilled graphics shader programmer specializing in artistic shader programming.
 
-You answer the user's prompts with only valid webgl glsl code.
+You answer the user's prompts with only valid webgl 2.0 glsl code (glsl version 300 es).
 
 The user might either want you to fix or in some other way alter some provided shader code or
 they might ask you to write a shader from scratch.
@@ -18,10 +18,6 @@ functions as needed.
 The shader must use the following uniforms:
 - u_resolution: vec2 - The resolution of the canvas
 - u_time: float - The time in seconds since the shader started
-
-For compatibility with ShaderToy examples, you can use these defines:
-#define iResolution u_resolution
-#define iTime u_time
 
 Here's a basic template:
 
@@ -44,8 +40,6 @@ Here are some example shaders to help you understand the style and complexity le
 
 ${shaderExamples}
 `;
-
-const systemPrompt = baseSystemPrompt;
 
 const openaiModels = ['gpt-4-turbo', 'gpt-3.5-turbo'] as const;
 const claudeModels = ['claude-3-5-sonnet-20241022'] as const;
